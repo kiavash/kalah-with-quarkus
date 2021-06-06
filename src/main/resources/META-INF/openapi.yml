@@ -1,0 +1,129 @@
+openapi: 3.0.3
+info:
+  title: Kalah Game API
+  version: "1.0"
+  description: Endpoint Design Specification
+paths:
+  /games:
+    post:
+      operationId: CreatingNewGame
+      summary: Creation of the game is possible via this interface
+      description: Create new game in order to play Kalah game. player names would not be specified but having player names is optional. 'curl --header "Content-Type application/json"   --request POST http://localhost:8080/games'
+      responses:
+        "201":
+          description: Game has been created successfully.
+          content:
+            application/json: {"id":1234,"url":"http://<host>:<port>/games/1234"}
+  /games/add/{gameId}/player/{playerName}:
+    put:
+      operationId: AddPlayerName
+      summary: Adding Player Name to the existing game
+      description: 'curl --header "Content-Type application/json"   --request PUT http://localhost:8080/games/add/{gameId}/player/{playerName}'
+      parameters:
+        - name: gameId
+          description: Game id which is returned in create new game service
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+        - name: playerName
+          description: Player name which is adding to existing game
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {"players":{"1":"Player 1","0":"Player 0"},"playerNumber":0}
+        "400":
+          description: Bad Request
+          content:
+            applcation/json: {"error": "Game Id not found!"}
+
+  /games/{gameId}/boardStatus:
+    get:
+      operationId: GetBoardStatus
+      summary: Get board status which show json object status as a key-value, where key is the pitid and value is the number of stones in the pit also Player Number show which player should play next hand players shows player names if exist isGameOver shows if game is finished or not, id is game id and uri is game uri
+      description:  'curl --header "Content-Type application/json"   --request GET http://localhost:8080/games/{gameId}/boardStatus'
+      parameters:
+        - name: gameId
+          description: game id of the board we want to see its status
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {"id":1848319449,"uri":"http://localhost:8080/games/1848319449","status":{"1":6,"2":6,"3":6,"4":6,"5":6,"6":6,"7":0,"8":6,"9":6,"10":6,"11":6,"12":6,"13":6,"14":0},"playerNumber":0,"players":{"1":"player1Name","0":"player0Name"},"isGameOver":false}
+        "400":
+          description: Bad Request
+          content:
+            applcation/json: { "error": "Game Id not found!" }
+    /games/{gameId}/pits/{pitId}:
+    put:
+      operationId: MakeAMove
+      summary: Make a move on a specific game id which in result shows json object status as a key-value, where key is the pitid and value is the number of stones in the pit also Player Number show which player should play next hand players shows player names if exist isGameOver shows if game is finished or not, id is game id and uri is game uri
+      description:  'curl --header "Content-Type application/json"   --request PUT http://localhost:8080/games/{gameId}/pits/{pitId}'
+      parameters:
+        - name: gameId
+          description: game id of the board we want to make a move
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+        - name: pitId
+          description: id of the pit selected to make a move. Pits are numbered from 1 to 14 where 7 and 14 are the kalah (or house) of each player
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {"id":1848319449,"uri":"http://localhost:8080/games/1848319449","status":{"1":6,"2":6,"3":6,"4":6,"5":6,"6":6,"7":0,"8":6,"9":6,"10":6,"11":6,"12":6,"13":6,"14":0},"playerNumber":0,"players":{"1":"player1Name","0":"player0Name"},"isGameOver":false}
+        "400":
+          description: Bad Request
+          content:
+            applcation/json: { "error": "Game Id not found!" ,"PitId is not in Range!" ,  "No Stone Moved!" }
+  /games/{gameId}/players:
+    post:
+      operationId: GetPlayersName
+      summary: Getting Players Name
+      description: you can call this service by command 'curl --header "Content-Type application/json"   --request POST http://localhost:8080/games/{gameId}/players'
+      parameters:
+        - name: gameId
+          description: unique id of the game you want to see its players name
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {"players":{"1":"player Name","0":"player0Name"}}
+        "400":
+          description: Bad Request
+          content:
+            applcation/json: { "error": "Game Id not found!" }
+  /games/list:
+    get:
+      operationId: GetListOfAvailableGames
+      summary: Getting list of available games. These games don't have two assigned player name so new player can joins them
+      description: you can call this service by command 'curl --header "Content-Type application/json"   --request GET http://localhost:8080/games/list'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {"games":{"0":907510930,"1":498212247,"2":813400786,"3":1188784180}}
+
